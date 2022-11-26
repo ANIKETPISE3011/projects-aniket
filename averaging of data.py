@@ -1,7 +1,7 @@
 import pandas as pd
 print('Averaging of data:\n')
 
-sfilename='‪'C:\\DS\\DATA SCIENCE\\IP_DATA_CORE.csv''
+sfilename='C:\\DS\\DATA SCIENCE\\IP_DATA_CORE.csv'
 Data=pd.read_csv(sfilename,header=0)
 print('Data details:\n',Data.head())
 print('********************************')
