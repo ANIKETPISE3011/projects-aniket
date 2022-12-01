@@ -22,7 +22,7 @@ print('calculate net input to output layer')
 yin=w[0]+z[0]*w[1]+z[1]*w[2]
 print('yin',yin)
 print('calculate the net output')
-y=round(1/(1+math.exp(yin)),4)
+y=round(1/(1+math.exp(-yin)),4)
 print('y=',y)
 fyin=y*(1-y)
 dk=round((1-y)*fyin,4)
