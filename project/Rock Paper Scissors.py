@@ -12,7 +12,7 @@ while(1 < 2):
         print('[R]ock,[S]cissor or [P]aper.')
         continue
     # Echo the user's choice
-    print('You chose:'+ userChoice)
+    print('You chose:' , userChoice)
     # the opponenet's choice
     choices=['R','P','S']
     opponenetChoice= random.choice(choices)
