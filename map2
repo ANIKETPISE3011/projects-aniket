@@ -1,0 +1,104 @@
+//GlossaryItem.cs
+namespace Glossary
+{
+public class GlossaryItem
+{
+public string Term { get; set; }
+public string Definition { get; set; }
+}
+}
+///////
+//Controllers/GlossaryController.cs
+using System;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc;
+using System.IO;
+namespace Glossary.Controllers
+{
+[ApiController]
+[Route(&quot;api/[controller]&quot;)]
+public class GlossaryController: ControllerBase
+{
+private static List&lt;GlossaryItem&gt; Glossary = new List&lt;GlossaryItem&gt; {
+new GlossaryItem
+{
+Term= &quot;HTML&quot;,
+Definition = &quot;Hypertext Markup Language&quot;
+
+},
+new GlossaryItem
+{
+Term= &quot;MVC&quot;,
+Definition = &quot;Model View Controller&quot;
+},
+new GlossaryItem
+{
+Term= &quot;OpenID&quot;,
+Definition = &quot;An open standard for authentication&quot;
+}
+};
+[HttpGet]
+public ActionResult&lt;List&lt;GlossaryItem&gt;&gt; Get()
+{ return Ok(Glossary);
+}
+[HttpGet]
+[Route(&quot;{term}&quot;)]
+public ActionResult&lt;GlossaryItem&gt; Get(string term)
+{
+var glossaryItem = Glossary.Find(item =&gt;
+item.Term.Equals(term, StringComparison.InvariantCultureIgnoreCase));
+if (glossaryItem == null)
+{ return NotFound();
+} else
+{
+return Ok(glossaryItem);
+}
+}
+[HttpPost]
+public ActionResult Post(GlossaryItem glossaryItem)
+{
+var existingGlossaryItem = Glossary.Find(item =&gt;
+item.Term.Equals(glossaryItem.Term, StringComparison.InvariantCultureIgnoreCase));
+if (existingGlossaryItem != null)
+{
+return Conflict(&quot;Cannot create the term because it already exists.&quot;);
+}
+else
+{
+Glossary.Add(glossaryItem);
+var resourceUrl =
+Path.Combine(Request.Path.ToString(),Uri.EscapeUriString(glossaryItem.Term));
+return Created(resourceUrl, glossaryItem);
+}
+}
+
+[HttpPut]
+public ActionResult Put(GlossaryItem glossaryItem)
+{
+var existingGlossaryItem = Glossary.Find(item =&gt;
+item.Term.Equals(glossaryItem.Term, StringComparison.InvariantCultureIgnoreCase));
+if (existingGlossaryItem == null)
+{
+return BadRequest(&quot;Cannot update a nont existing term.&quot;);
+} else
+{
+existingGlossaryItem.Definition = glossaryItem.Definition;
+return Ok();
+}
+}
+[HttpDelete]
+[Route(&quot;{term}&quot;)]
+public ActionResult Delete(string term)
+{
+var glossaryItem = Glossary.Find(item =&gt;
+item.Term.Equals(term, StringComparison.InvariantCultureIgnoreCase));
+if (glossaryItem == null)
+{ return NotFound();
+}
+else
+{ Glossary.Remove(glossaryItem);
+return NoContent();
+}
+}
+}
+}
