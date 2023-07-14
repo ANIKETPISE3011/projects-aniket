@@ -1,0 +1,56 @@
+Practical 1
+a .Program to calculate number of samples required for an image. 
+b .Program to study the effects of reducing the spatial resolution of a digital image. 
+c .Program to study the effects of varying the number of intensity levels in a digital image 
+d .Program to perform image averaging (image addition) for noise reduction.
+e .Program to compare images using subtraction for enhancing the difference between images.
+
+Practical 2
+A. Basic Intensity Transformation functions
+i. Program to perform Image negation 
+ii. Program to perform threshold on an image. 
+iii. Program to perform Log transformation 
+iv. Power-law transformations 
+v. Piecewise linear transformations 
+a. Contrast Stretching 
+b. Gray-level slicing with and without background. 
+c. Bit-plane slicing
+B. 
+1. Program to plot the histogram of an image and categorise 
+2. Program to apply histogram equalization 
+
+C Write a program to perform convolution and correlation 
+D Write a program to apply smoothing and sharpening filters on grayscale and color images 
+a) Low Pass 
+b) High Pass
+
+Practical 3
+Filtering in Frequency Domain 
+a) Program to apply Discrete Fourier Transform on an image 
+b) Program to apply Low pass and High pass filters in frequency domain 
+c) Program to apply Laplacian filter and high boost in frequency domain 
+d) Program for homomorphic filtering.
+
+Practical 4
+Image Denoising 
+a) Program to denoise using spatial mean and median filtering 
+b) Program for Image deblurring using Weiner filters.
+
+Practical 5
+Color Image Processing 
+a) Program to read a color image and segment into RGB planes , histogram of color image .
+b) Program for converting from one color model to another model. 
+c) Program to apply false colouring(pseudo) on a grey scale image
+
+Practical 6
+Program to compute Discrete Cosine Transforms
+
+Practical 7
+a) Program to apply erosion, dilation, opening, closing 
+b) Program for detecting boundary of an image 
+c) Program to apply Hit-or-Miss transform 
+d) Program to apply morphological gradient on an image 
+e) Program to apply Top-Hat/Bottom-hat Transformations
+
+Practical 8
+Program for Edge detection using Sobel, Prewitt and Canny
