@@ -1,0 +1,119 @@
+Router R1 (hostname SanJose) 
+hostname SanJose
+interface Loopback0 
+ip address 10.1.1.1 255.255.255.0 
+interface Serial1/1
+ip address 192.168.1.5 255.255.255.252 
+clock rate 128000 
+no shutdown
+
+Router R2 (hostname ISP) 
+hostname ISP  
+interface Loopback0 
+ip address 10.2.2.1 255.255.255.0  
+interface Serial1/1 
+ip address 192.168.1.6 255.255.255.252 
+no shutdown  
+interface Serial1/0
+ip address 172.24.1.17 255.255.255.252 
+clock rate 128000 
+no shutdown 
+
+Router R3 (hostname CustRtr) 
+hostname CustRtr 
+interface Loopback0 
+ip address 10.3.3.1 255.255.255.0  
+interface Serial1/0
+ip address 172.24.1.18 255.255.255.252 
+no shutdown 
+
+Router R1 (hostname SanJose) 
+router bgp 100 
+neighbor 192.168.1.6 remote-as 300 
+network 10.1.1.0 mask 255.255.255.0 
+
+Router R2 (hostname ISP) 
+router bgp 300 
+neighbor 192.168.1.5 remote-as 100 
+neighbor 172.24.1.18 remote-as 65000 
+network 10.2.2.0 mask 255.255.255.0 
+
+Router R3 (hostname CustRtr) 
+router bgp 65000 
+neighbor 172.24.1.17 remote-as 300 
+network 10.3.3.0 mask 255.255.255.0 
+
+Router R2 (hostname ISP)  
+show ip bgp neighbors 
+
+Router R1 (hostname SanJose) 
+ show ip route 
+
+Router R1 (hostname SanJose) 
+ SanJose#ping 
+  Protocol [ip]: 
+Target IP address: 10.3.3.1 
+Repeat count [5]: 
+Datagram size [100]: 
+Timeout in seconds [2]: 
+Extended commands [n]: y 
+Source address or interface: 10.1.1.1 
+Type of service [0]: 
+Set DF bit in IP header? [no]: 
+Validate reply data? [no]: 
+Data pattern [0xABCD]: 
+Loose, Strict, Record, Timestamp, Verbose[none]: 
+Sweep range of sizes [n]: 
+Type escape sequence to abort. 
+Sending 5, 100-byte ICMP Echos to 10.3.3.1, timeout is 2 seconds: 
+!!!!! 
+Success rate is 100 percent (5/5), round-trip min/avg/max = 64/64/68 ms 
+
+SanJose# ping 10.3.3.1 source 10.1.1.1 
+
+Router R1 (hostname SanJose)
+ show ip bgp 
+
+Router R2 (hostname ISP)  
+router bgp 300 
+ neighbor 192.168.1.5 remove-private-as 
+clear ip bgp * 
+
+Router R1 (hostname SanJose) 
+ping 10.3.3.1 source lo0 
+
+Router R1 (hostname SanJose) 
+show ip bgp 
+
+Router R2 (hostname ISP) 
+ip as-path access-list 1 deny ^100$ 
+ip as-path access-list 1 permit .* 
+
+Router R2 (hostname ISP)
+ router bgp 300 
+neighbor 172.24.1.18 filter-list 1 out 
+clear ip bgp * 
+
+Router R2 (hostname ISP)
+show ip route 
+
+Router R3 (hostname CustRtr)  
+show ip route 
+
+Router R2 (hostname ISP)
+ show ip bgp regexp ^100$ 
+
+
+Router R2 (hostname ISP)
+ISP#tclsh
+
+ISP(tcl)#foreach address {
++>10.1.1.1
++>10.2.2.1
++>10.3.3.1
++>192.168.1.5
++>192.168.1.6
++>172.24.1.17
++>172.24.1.18 }
+Ping $address
+
