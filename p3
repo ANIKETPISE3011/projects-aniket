@@ -1,81 +1,205 @@
-R1 (hostname ISP)
-conf t
+Router R1 (hostname ISP)
 hostname ISP
 
-R2 (hostname SanJose1)
-conf t
-hostname SanJose1
-R3(hostname SanJose2)
-conf t
-hostname SanJose2
-
-Run the following in all the router consoles:
-
-no ip domain-lookup
-line con 0
-logging synchronous
-exec-timeout 0 0
-
-R1(hostname ISP)
-conf t
-hostname ISP
-interface Loopback0 
-ip address 192.168.100.1 255.255.255.0 
-exit 
-interface S1/0 
-ip address 192.168.1.5 255.255.255.252 
-clock rate 128000 
-no shutdown 
-exit 
-interface S1/1 
-ip address 192.168.1.1 255.255.255.252 
+interface Loopback0
+ip address 192.168.100.1 255.255.255.0
+interface Serial0/0/0
+ip address 192.168.1.5 255.255.255.252
+clock rate 128000
 no shutdown
-end 
 
-R2 (hostname SanJose1)
-conf t
-hostname SanJose1
-interface Loopback0 
-ip address 192.168.100.1 255.255.255.0 
-exit 
-interface S1/0
-ip address 192.168.1.5 255.255.255.252 
-clock rate 128000 
-no shutdown 
-exit 
-interface S1/1 
-ip address 192.168.1.1 255.255.255.252 
-no shutdown 
-End
+interface Serial0/0/1
+ip address 192.168.1.1 255.255.255.252
+no shutdown
 
-R2(hostname SanJose1)
-router bgp 64512
-neighbor 172.16.32.1 remote-as 64512
-neighbor 172.16.32.1 update-source lo0
-b. Complete the IBGP configuration on SanJose2 using the following commands.
-R3(hostname SanJose2)
-router bgp 64512
-neighbor 172.16.64.1 remote-as 64512
-neighbor 172.16.64.1 update-source lo0
-exit
-exit
-SanJose2# show ip bgp neighbors
+Router R2 (hostname Mumbai)
+hostname Mumbai
+interface Loopback0
+ip address 172.16.64.1 255.255.255.0
+interface Serial0/0/0
+ip address 192.168.1.6 255.255.255.252
+no shutdown
 
-R1(hostname ISP)
+interface Serial0/0/1
+ip address 172.16.1.1 255.255.255.0
+clock rate 128000
+no shutdown
+
+Router R3 (hostname Delhi)
+hostname Delhi
+
+interface Loopback0
+ip address 172.16.32.1 255.255.255.0
+
+interface Serial0/0/0
+ip address 192.168.1.2 255.255.255.252
+clock rate 128000
+no shutdown
+
+interface Serial0/0/1
+ip address 172.16.1.2 255.255.255.0
+no shutdown
+
+Step 3: Configure EIGRP between the Mumbai and Delhi routers.
+
+Mumbai(config)# router eigrp 64512
+Mumbai(config-router)# no auto-summary
+Mumbai(config-router)# network 172.16.0.0
+
+Delhi(config)# router eigrp 64512
+Delhi(config-router)# no auto-summary
+Delhi(config-router)# network 172.16.0.0
+
+Mumbai(config)# router bgp 64512
+Mumbai(config-router)# neighbor 172.16.32.1 remote-as 64512
+Mumbai(config-router)# neighbor 172.16.32.1 update-source lo0
+
+Delhi(config)# router bgp 64512
+Delhi(config-router)# neighbor 172.16.64.1 remote-as 64512
+Delhi(config-router)# neighbor 172.16.64.1 update-source lo0
+Delhi# show ip bgp neighbors
+
 ISP(config)# router bgp 200
-ISP(config-router)# neighbor 192.168.1.6 remote-as 64512
-ISP(config-router)# neighbor 192.168.1.2 remote-as 64512
+ISP(config-router)# neighbor 192.168.1.6 remote-as64512
+ISP(config-router)# neighbor 192.168.1.2 remote-as64512
 ISP(config-router)# network 192.168.100.0
 
+Mumbai(config)# ip route 172.16.0.0 255.255.0.0 null0
+Mumbai(config)# router bgp 64512
+Mumbai(config-router)# neighbor 192.168.1.5 remote-as 200
+Mumbai(config-router)# network 172.16.0.0
+Mumbai# show ip bgp neighbors
 
-R2(hostname SanJose1)
-exit
-SanJose1(config)# ip route 172.16.0.0 255.255.0.0 null0
+Delhi(config)# ip route 172.16.0.0 255.255.0.0 null0
+Delhi(config)# router bgp 64512
+Delhi(config-router)# neighbor 192.168.1.1 remote-as 200
+Delhi(config-router)# network 172.16.0.0
+Delhi# show ip bgp summary
 
-R2(hostname SanJose1)
-SanJose1(config)# router bgp 64512
-SanJose1(config-router)# neighbor 192.168.1.5 remote-as 200
-SanJose1(config-router)# network 172.16.0.0
+ISP# show ip bgp
 
-R2(hostname SanJose1)
-SanJose1# show ip bgp neighbors
+ISP# ping 172.16.1.1 source 192.168.100.1
+ISP# ping 172.16.32.1 source 192.168.100.1
+ISP# ping 172.16.1.2 source 192.168.100.1
+ISP# ping 172.16.64.1 source 192.168.100.1
+
+ISP# ping
+Protocol [ip]:
+Target IP address: 172.16.64.1
+Repeat count [5]:
+Datagram size [100]:
+Timeout in seconds [2]:
+Extended commands [n]: y
+Source address or interface: 192.168.100.1
+Type of service [0]:
+Set DF bit in IP header? [no]:
+
+ISP(config)# router bgp 200
+ISP(config-router)# network 192.168.1.0 mask255.255.255.252
+ISP(config-router)# network 192.168.1.4 mask255.255.255.252
+
+ISP# show ip bgp
+
+Delhi# show ip route
+
+Delhi# show ip bgp
+
+Mumbai(config)# router bgp 64512
+Mumbai(config-router)# neighbor 172.16.32.1 next-hop-self
+Delhi(config)# router bgp 64512
+Delhi(config-router)# neighbor 172.16.64.1 next-hop-self
+
+Delhi# show ip bgp
+
+Mumbai(config)# route-map PRIMARY_T1_IN permit 10
+Mumbai(config-route-map)# set local-preference 150
+Mumbai(config-route-map)# exit
+Mumbai(config)# router bgp 64512
+Mumbai(config-router)# neighbor 192.168.1.5 route-map PRIMARY_T1_IN
+in
+
+Delhi(config)# route-map SECONDARY_T1_IN permit 10 Delhi(config-
+route-map)# set local-preference 125
+
+Mumbai(config-route-map)# exit
+Delhi(config)# router bgp 64512
+Delhi(config-router)# neighbor 192.168.1.1 route-map SECONDARY_T1_IN
+in
+
+Mumbai# clear ip bgp *soft
+Delhi# clear ip bgp *soft
+
+Mumbai# show ip bgp
+
+Delhi# show ip bgp
+
+Delhi# ping
+Protocol[ip]:
+Target IP address: 192.168.100.1
+Repeat count [5]: 2
+Datagram size [100]:
+Timeout in seconds [2]:
+Extended commands [n]: y
+Source address or interface: 172.16.32.1
+Type of service [0]:
+Set DF bit in IP header? [no]:
+Validate reply data? [no]:
+Data pattern [0xABCD]:
+Loose, Strict, Record, Timestamp, Verbose[none]: record
+Number of hops [ 9 ]:
+Loose, Strict, Record, Timestamp, Verbose[RV]:
+Sweep range of sizes [n]:
+
+Mumbai(config)#route-map PRIMARY_T1_MED_OUT permit 10
+Mumbai(config-route-map)#set Metric 50
+Mumbai(config-route-map)#exit
+Mumbai(config)#router bgp 64512
+
+Mumbai(config-router)#neighbor 192.168.1.5 route-map
+
+Delhi(config)#route-map SECONDARY_T1_MED_OUT permit 10
+Delhi(config-route-map)#set Metric 75 Delhi(config-route-map)#exit
+Delhi(config)#router bgp 64512
+Delhi(config-router)#neighbor 192.168.1.1 route-map
+
+Mumbai# clear ip bgp *soft
+Delhi# clear ip bgp *soft
+
+Mumbai# show ip bgp
+
+Delhi# ping
+Protocol[ip]:
+Target IP address: 192.168.100.1
+Repeat count [5]: 2
+Datagram size [100]:
+Timeout in seconds [2]:
+Extended commands [n]: y
+Source address or interface: 172.16.32.1
+Type of service [0]:
+Set DF bit in IP header? [no]:
+Validate reply data? [no]:
+Data pattern [0xABCD]:
+Loose, Strict, Record, Timestamp, Verbose[none]: record
+Number of hops [ 9 ]:
+Loose, Strict, Record, Timestamp, Verbose[RV]:
+Sweep range of sizes [n]:
+
+ISP# show ip bgp
+
+Mumbai# show ip route
+Mumbai(config)#ip default-network 192.168.100.0
+
+Mumbai# show ip route
+ISP# tclsh
+
+foreach address { 192.168.100.1
+172.16.64.1
+172.16.32.1
+192.168.1.1
+192.168.1.2
+192.168.1.5
+192.168.1.6
+172.16.1.1
+172.16.1.2
+} {
+ping $address }
